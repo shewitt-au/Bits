@@ -51,7 +51,7 @@ LPVOID Map(LPCWSTR pFile)
 	HANDLE hMapping = CreateFileMapping(
 		hFile,         // HANDLE hFile
 		NULL,          // LPSECURITY_ATTRIBUTES lpFileMappingAttributes
-		PAGE_READONLY | SEC_IMAGE_NO_EXECUTE, //DWORD  flProtect
+		PAGE_READONLY, //DWORD  flProtect
 		0,             // DWORD  dwMaximumSizeHigh
 		0,             // DWORD  dwMaximumSizeLow
 		NULL           // LPCSTR lpName
@@ -79,6 +79,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(nCmdShow);
+
+	lpCmdLine = (LPWSTR)L"C:\\Commands\\Eula.txt";
 	
 	WORD magic;
 	PIMAGE_DOS_HEADER pDOS;
