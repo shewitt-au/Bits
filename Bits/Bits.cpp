@@ -34,16 +34,53 @@ extern "C" int MyStartup()
 	return wWinMain(hInst, NULL, lpCmdLine, si.wShowWindow);
 }
 
+LPVOID Map(LPCWSTR pFile)
+{
+	HANDLE hFile = CreateFileW(
+		pFile,                // LPCWSTR lpFileName
+		GENERIC_READ,	       // DWORD   dwDesiredAccess
+		FILE_SHARE_READ,       // DWORD   dwShareMode
+		NULL,                  // LPSECURITY_ATTRIBUTES lpSecurityAttributes
+		OPEN_EXISTING,         // DWORD   dwCreationDisposition
+		FILE_ATTRIBUTE_NORMAL, // DWORD   dwFlagsAndAttributes
+		NULL                   // HANDLE  hTemplateFile
+	);
+	if (hFile == INVALID_HANDLE_VALUE)
+		return NULL;
+
+	HANDLE hMapping = CreateFileMapping(
+		hFile,         // HANDLE hFile
+		NULL,          // LPSECURITY_ATTRIBUTES lpFileMappingAttributes
+		PAGE_READONLY | SEC_IMAGE_NO_EXECUTE, //DWORD  flProtect
+		0,             // DWORD  dwMaximumSizeHigh
+		0,             // DWORD  dwMaximumSizeLow
+		NULL           //LPCSTR lpName
+	);
+	CloseHandle(hFile);
+	if (hMapping == NULL)
+		return NULL;
+
+	LPVOID pView = MapViewOfFile(
+		hMapping,      // HANDLE hFileMappingObject
+		FILE_MAP_READ, // DWORD  dwDesiredAccess
+		0,             // DWORD  dwFileOffsetHigh
+		0,             // DWORD  dwFileOffsetLow
+		0              // SIZE_T dwNumberOfBytesToMap
+	);
+	CloseHandle(hMapping);
+
+	return pView;
+}
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
     UNREFERENCED_PARAMETER(nCmdShow);
-
-	MessageBox(NULL, lpCmdLine, L"Bits", MB_OK);
+	
+	LPCVOID pView = Map(L"C:\\Commands\\handle.exe");
 
 	PIMAGE_DOS_HEADER pDOS = (PIMAGE_DOS_HEADER)hInstance;
 	if (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
@@ -51,6 +88,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		MessageBox(NULL, L"Crap!", L"Bits", MB_OK);
 		return 1;
 	}
+	PIMAGE_NT_HEADERS pNT = (PIMAGE_NT_HEADERS)((char*)pDOS + pDOS->e_lfanew);
+	WORD magic = pNT->OptionalHeader.Magic;
 
 	return 0;
 }
