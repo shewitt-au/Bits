@@ -80,19 +80,27 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(nCmdShow);
 	
+	WORD magic;
+	PIMAGE_DOS_HEADER pDOS;
+	PIMAGE_NT_HEADERS pNT;
+	LPCWSTR pMsg = NULL;
+
 	LPCVOID pView = Map(lpCmdLine);
 	if (!pView)
-		return 1;
+	{
+		pMsg = L"Can't map file!";
+		goto bail;
+	}
 
-	PIMAGE_DOS_HEADER pDOS = (PIMAGE_DOS_HEADER)pView;
+	pDOS = (PIMAGE_DOS_HEADER)pView;
 	if (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
 	{
-		return 2;
+		pMsg = L"No DOS header!";
+		goto bail;
 	}
-	PIMAGE_NT_HEADERS pNT = (PIMAGE_NT_HEADERS)((char*)pDOS + pDOS->e_lfanew);
-	WORD magic = pNT->OptionalHeader.Magic;
+	pNT = (PIMAGE_NT_HEADERS)((char*)pDOS + pDOS->e_lfanew);
+	magic = pNT->OptionalHeader.Magic;
 
-	LPCWSTR pMsg;
 	switch (magic)
 	{
 	case IMAGE_NT_OPTIONAL_HDR32_MAGIC:
@@ -106,6 +114,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		break;
 	}
 
+bail:
+	UnmapViewOfFile(pView);
 	MessageBox(NULL, pMsg, L"Bits", MB_OK);
 
 	return 0;
