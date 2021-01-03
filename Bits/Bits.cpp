@@ -31,7 +31,9 @@ extern "C" int MyStartup()
 	LPWSTR lpCmdLine = WithoutExe(GetCommandLine());
 	STARTUPINFO si;
 	GetStartupInfo(&si);
-	return wWinMain(hInst, NULL, lpCmdLine, si.wShowWindow);
+	ExitProcess(wWinMain(hInst, NULL, lpCmdLine, si.wShowWindow));
+
+	return 0;
 }
 
 LPVOID Map(LPCWSTR pFile)
@@ -79,6 +81,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(nCmdShow);
+
+	//lpCmdLine = (LPWSTR)L"C:\\Users\\steve\\Desktop\\VDS_S4";
 	
 	WORD magic;
 	PIMAGE_DOS_HEADER pDOS;
@@ -116,7 +120,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 bail:
 	UnmapViewOfFile(pView);
-	MessageBox(NULL, pMsg, L"Bits", MB_OK);
+	MessageBox(NULL, pMsg, lpCmdLine, MB_OK);
 
 	return 0;
 }
