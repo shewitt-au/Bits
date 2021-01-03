@@ -37,7 +37,7 @@ extern "C" int MyStartup()
 LPVOID Map(LPCWSTR pFile)
 {
 	HANDLE hFile = CreateFileW(
-		pFile,                // LPCWSTR lpFileName
+		pFile,                 // LPCWSTR lpFileName
 		GENERIC_READ,	       // DWORD   dwDesiredAccess
 		FILE_SHARE_READ,       // DWORD   dwShareMode
 		NULL,                  // LPSECURITY_ATTRIBUTES lpSecurityAttributes
@@ -54,7 +54,7 @@ LPVOID Map(LPCWSTR pFile)
 		PAGE_READONLY | SEC_IMAGE_NO_EXECUTE, //DWORD  flProtect
 		0,             // DWORD  dwMaximumSizeHigh
 		0,             // DWORD  dwMaximumSizeLow
-		NULL           //LPCSTR lpName
+		NULL           // LPCSTR lpName
 	);
 	CloseHandle(hFile);
 	if (hMapping == NULL)
@@ -80,16 +80,33 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(nCmdShow);
 	
-	LPCVOID pView = Map(L"C:\\Commands\\handle.exe");
+	LPCVOID pView = Map(lpCmdLine);
+	if (!pView)
+		return 1;
 
-	PIMAGE_DOS_HEADER pDOS = (PIMAGE_DOS_HEADER)hInstance;
+	PIMAGE_DOS_HEADER pDOS = (PIMAGE_DOS_HEADER)pView;
 	if (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
 	{
-		MessageBox(NULL, L"Crap!", L"Bits", MB_OK);
-		return 1;
+		return 2;
 	}
 	PIMAGE_NT_HEADERS pNT = (PIMAGE_NT_HEADERS)((char*)pDOS + pDOS->e_lfanew);
 	WORD magic = pNT->OptionalHeader.Magic;
+
+	LPCWSTR pMsg;
+	switch (magic)
+	{
+	case IMAGE_NT_OPTIONAL_HDR32_MAGIC:
+		pMsg = L"32 bit";
+		break;
+	case IMAGE_NT_OPTIONAL_HDR64_MAGIC:
+		pMsg = L"64 bit";
+		break;
+	default:
+		pMsg = L"Unknown";
+		break;
+	}
+
+	MessageBox(NULL, pMsg, L"Bits", MB_OK);
 
 	return 0;
 }
