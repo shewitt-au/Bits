@@ -8,6 +8,7 @@
 //#pragma comment(linker, "/merge:.idata=.text") // REFUSES TO WORK
 
 #include "framework.h"
+#include <stdint.h>
 
 LPWSTR WithoutExe(LPWSTR pCmdLine)
 {
@@ -36,43 +37,76 @@ extern "C" int MyStartup()
 	return 0;
 }
 
-LPVOID Map(LPCWSTR pFile)
+class MemFile
 {
-	HANDLE hFile = CreateFileW(
-		pFile,                 // LPCWSTR lpFileName
-		GENERIC_READ,	       // DWORD   dwDesiredAccess
-		FILE_SHARE_READ,       // DWORD   dwShareMode
-		NULL,                  // LPSECURITY_ATTRIBUTES lpSecurityAttributes
-		OPEN_EXISTING,         // DWORD   dwCreationDisposition
-		FILE_ATTRIBUTE_NORMAL, // DWORD   dwFlagsAndAttributes
-		NULL                   // HANDLE  hTemplateFile
-	);
-	if (hFile == INVALID_HANDLE_VALUE)
-		return NULL;
+public:
+	MemFile(LPCWSTR pFile)
+	{
+		m_pBegin = NULL;
 
-	HANDLE hMapping = CreateFileMapping(
-		hFile,         // HANDLE hFile
-		NULL,          // LPSECURITY_ATTRIBUTES lpFileMappingAttributes
-		PAGE_READONLY, //DWORD  flProtect
-		0,             // DWORD  dwMaximumSizeHigh
-		0,             // DWORD  dwMaximumSizeLow
-		NULL           // LPCSTR lpName
-	);
-	CloseHandle(hFile);
-	if (hMapping == NULL)
-		return NULL;
+		HANDLE hFile = CreateFileW(
+			pFile,                 // LPCWSTR lpFileName
+			GENERIC_READ,	       // DWORD   dwDesiredAccess
+			FILE_SHARE_READ,       // DWORD   dwShareMode
+			NULL,                  // LPSECURITY_ATTRIBUTES lpSecurityAttributes
+			OPEN_EXISTING,         // DWORD   dwCreationDisposition
+			FILE_ATTRIBUTE_NORMAL, // DWORD   dwFlagsAndAttributes
+			NULL                   // HANDLE  hTemplateFile
+		);
+		if (hFile == INVALID_HANDLE_VALUE)
+			return;
 
-	LPVOID pView = MapViewOfFile(
-		hMapping,      // HANDLE hFileMappingObject
-		FILE_MAP_READ, // DWORD  dwDesiredAccess
-		0,             // DWORD  dwFileOffsetHigh
-		0,             // DWORD  dwFileOffsetLow
-		0              // SIZE_T dwNumberOfBytesToMap
-	);
-	CloseHandle(hMapping);
+		LARGE_INTEGER size;
+		if (!GetFileSizeEx(hFile, &size))
+		{
+			CloseHandle(hFile);
+			return;
+		}
 
-	return pView;
-}
+		HANDLE hMapping = CreateFileMapping(
+			hFile,         // HANDLE hFile
+			NULL,          // LPSECURITY_ATTRIBUTES lpFileMappingAttributes
+			PAGE_READONLY, //DWORD  flProtect
+			0,             // DWORD  dwMaximumSizeHigh
+			0,             // DWORD  dwMaximumSizeLow
+			NULL           // LPCSTR lpName
+		);
+		CloseHandle(hFile);
+		if (hMapping == NULL)
+			return;
+
+		m_pBegin = (uint8_t*)MapViewOfFile(
+			hMapping,      // HANDLE hFileMappingObject
+			FILE_MAP_READ, // DWORD  dwDesiredAccess
+			0,             // DWORD  dwFileOffsetHigh
+			0,             // DWORD  dwFileOffsetLow
+			0              // SIZE_T dwNumberOfBytesToMap
+		);
+		CloseHandle(hMapping);
+		m_pEnd = m_pBegin + size.QuadPart;
+	}
+
+	~MemFile()
+	{
+		if (m_pBegin)
+			UnmapViewOfFile(m_pBegin);
+	}
+
+	uint8_t* view() const
+	{
+		return m_pBegin;
+	}
+
+	bool check(LPCVOID p) const
+	{
+		return p >= m_pBegin && p < m_pEnd;
+	}
+
+private:
+	uint8_t *m_pBegin;
+	uint8_t *m_pEnd;
+
+};
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -89,7 +123,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	PIMAGE_NT_HEADERS pNT;
 	LPCWSTR pMsg = NULL;
 
-	LPCVOID pView = Map(lpCmdLine);
+////////////////////////////////////
+//	lpCmdLine = (LPWSTR)L"C:\\DOS\\dn3d-box\\DUKE3D\\COMMIT.EXE";
+////////////////////////////////////
+
+	MemFile mf(lpCmdLine);
+	LPCVOID pView = mf.view();
 	if (!pView)
 	{
 		pMsg = L"Can't map file!";
@@ -97,12 +136,30 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 
 	pDOS = (PIMAGE_DOS_HEADER)pView;
+	if (!mf.check(&pDOS->e_lfanew))
+	{
+		pMsg = L"File too small!";
+		goto bail;
+	}
 	if (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
 	{
 		pMsg = L"No DOS header!";
 		goto bail;
 	}
 	pNT = (PIMAGE_NT_HEADERS)((char*)pDOS + pDOS->e_lfanew);
+
+	if (!mf.check(&pNT->OptionalHeader.Magic))
+	{
+		pMsg = L"File too small!";
+		goto bail;
+	}
+
+	if (pNT->Signature != IMAGE_NT_SIGNATURE)
+	{
+		pMsg = L"No NT header!";
+		goto bail;
+	}
+
 	magic = pNT->OptionalHeader.Magic;
 
 	switch (magic)
@@ -119,7 +176,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 
 bail:
-	UnmapViewOfFile(pView);
 	MessageBox(NULL, pMsg, lpCmdLine, MB_OK);
 
 	return 0;
