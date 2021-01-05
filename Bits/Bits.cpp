@@ -124,7 +124,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	LPCWSTR pMsg = NULL;
 
 ////////////////////////////////////
-//	lpCmdLine = (LPWSTR)L"C:\\DOS\\dn3d-box\\DUKE3D\\COMMIT.EXE";
+//	lpCmdLine = (LPWSTR)LR"(C:\Program Files\WinVICE-3.1-x64\x64.exe)";
 ////////////////////////////////////
 
 	MemFile mf(lpCmdLine);
@@ -146,7 +146,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		pMsg = L"No DOS header!";
 		goto bail;
 	}
+
 	pNT = (PIMAGE_NT_HEADERS)((char*)pDOS + pDOS->e_lfanew);
+	if (!mf.check(pNT))
+	{
+		pMsg = L"e_lfanew in DOS header out of range!";
+		goto bail;
+	}
 
 	if (!mf.check(&pNT->OptionalHeader.Magic))
 	{
