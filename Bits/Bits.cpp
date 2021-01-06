@@ -97,9 +97,10 @@ public:
 		return m_pBegin;
 	}
 
-	bool check(LPCVOID p) const
+	template <typename T>
+	bool check(T *p) const
 	{
-		return p >= m_pBegin && p < m_pEnd;
+		return (uint8_t*)p >= m_pBegin && (uint8_t*)p + sizeof(T) <= m_pEnd;
 	}
 
 private:
