@@ -33,7 +33,7 @@ extern "C" int MyStartup()
 	// somewhat "retro". We want to get as fancy as the client system
 	// supports but still run on DPI-unaware systems. To that end we use
 	// runtime linking and try for the newest-fangledness we can get.
-	HMODULE hU32 = GetModuleHandle(L"user32.dll");
+	HMODULE hU32 = GetModuleHandleA("user32.dll");
 	if (hU32)
 	{
 		typedef DPI_AWARENESS_CONTEXT (WINAPI *PDPIAC)(DPI_AWARENESS_CONTEXT);
