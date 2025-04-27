@@ -34,7 +34,11 @@ extern "C" int MyStartup()
 		typedef DPI_AWARENESS_CONTEXT (WINAPI *PSTDA)(DPI_AWARENESS_CONTEXT);
 		PSTDA pSTDA = (PSTDA)GetProcAddress(hU32, "SetThreadDpiAwarenessContext");
 		if (pSTDA)
-			(*pSTDA)(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
+		{
+			auto old = (*pSTDA)(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+			if (!old)
+				(*pSTDA)(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
+		}
 	}
 
 	HINSTANCE hInst = (HINSTANCE)GetModuleHandle(NULL);
