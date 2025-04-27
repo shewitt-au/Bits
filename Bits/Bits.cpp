@@ -134,17 +134,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(nCmdShow);
-
-	//lpCmdLine = (LPWSTR)L"C:\\Users\\steve\\Desktop\\VDS_S4";
 	
 	WORD magic;
 	PIMAGE_DOS_HEADER pDOS;
 	PIMAGE_NT_HEADERS pNT;
 	LPCWSTR pMsg = NULL;
-
-////////////////////////////////////
-//	lpCmdLine = (LPWSTR)LR"(C:\Program Files\WinVICE-3.1-x64\x64.exe)";
-////////////////////////////////////
 
 	MemFile mf(lpCmdLine);
 	LPCVOID pView = mf.view();
