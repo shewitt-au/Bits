@@ -144,9 +144,9 @@ void ManageShellIntegration()
 {
     int req = MessageBoxA(
                 NULL,
-                "Do you want Shell integration?\n"
-                    "Selecting \"Yes\" enables it, and \"No\" disables it.",
-                "Shell integration?",
+                "Do you want an Explorer context menu?\n"
+                    "Selecting \"Yes\" adds one, and \"No\" removes it.",
+                "Explorer context menu?",
                 MB_YESNOCANCEL
                 );
     switch (req)
