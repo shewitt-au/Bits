@@ -16,7 +16,7 @@ int i;
 void ElevateClone()
 {
 	WCHAR MyPath[MAX_PATH];
-	GetModuleFileName(NULL, MyPath, sizeof(MyPath));
+	GetModuleFileName(NULL, MyPath, sizeof(MyPath)/sizeof(WCHAR));
 
 	SHELLEXECUTEINFO Info = {
 		sizeof(SHELLEXECUTEINFO),	// DWORD cbSize
