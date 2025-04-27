@@ -37,7 +37,8 @@ void ElevateClone()
         NULL						// HANDLE hProcess
     };
 
-    ShellExecuteEx(&Info);
+    if (!ShellExecuteEx(&Info))
+        MessageBoxA(NULL, "Failed to elevate!", NULL, MB_OK | MB_ICONERROR);
 }
 
 void Install()
@@ -298,12 +299,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     PIMAGE_DOS_HEADER pDOS;
     PIMAGE_NT_HEADERS pNT;
     LPCWSTR pMsg = NULL;
+    bool bError = false;
 
     MemFile mf(lpCmdLine);
     LPCVOID pView = mf.view();
     if (!pView)
     {
         pMsg = L"Can't map file!";
+        bError = true;
         goto bail;
     }
 
@@ -311,11 +314,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     if (!mf.check(&pDOS->e_lfanew))
     {
         pMsg = L"File too small!";
+        bError = true;
         goto bail;
     }
     if (pDOS->e_magic != IMAGE_DOS_SIGNATURE)
     {
         pMsg = L"No DOS header!";
+        bError = true;
         goto bail;
     }
 
@@ -323,18 +328,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     if (!mf.check(pNT))
     {
         pMsg = L"e_lfanew in DOS header out of range!";
+        bError = true;
         goto bail;
     }
 
     if (!mf.check(&pNT->OptionalHeader.Magic))
     {
         pMsg = L"File too small!";
+        bError = true;
         goto bail;
     }
 
     if (pNT->Signature != IMAGE_NT_SIGNATURE)
     {
         pMsg = L"No NT header!";
+        bError = true;
         goto bail;
     }
 
@@ -354,7 +362,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     }
 
 bail:
-    MessageBox(NULL, pMsg, lpCmdLine, MB_OK);
+    MessageBox(NULL, pMsg, lpCmdLine, MB_OK|(bError?MB_ICONERROR:0));
 
     return 0;
 }
