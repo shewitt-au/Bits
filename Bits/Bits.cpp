@@ -36,7 +36,7 @@ extern "C" int MyStartup()
 	HMODULE hU32 = GetModuleHandle(L"user32.dll");
 	if (hU32)
 	{
-		typedef DPI_AWARENESS_CONTEXT (WINAPI * PDPIAC)(DPI_AWARENESS_CONTEXT);
+		typedef DPI_AWARENESS_CONTEXT (WINAPI *PDPIAC)(DPI_AWARENESS_CONTEXT);
 		PDPIAC pFn = (PDPIAC)GetProcAddress(hU32, "SetThreadDpiAwarenessContext");
 		if (pFn)
 		{
