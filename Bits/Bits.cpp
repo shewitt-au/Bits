@@ -11,8 +11,6 @@
 #include <stdint.h>
 #include <shellapi.h>
 
-int i;
-
 void ElevateClone()
 {
 	WCHAR MyPath[MAX_PATH];
