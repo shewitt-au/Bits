@@ -147,7 +147,7 @@ void ManageShellIntegration()
                 "Do you want an Explorer context menu?\n"
                     "Selecting \"Yes\" adds one, and \"No\" removes it.",
                 "Explorer context menu?",
-                MB_YESNOCANCEL
+                MB_YESNOCANCEL | MB_ICONQUESTION
                 );
     switch (req)
     {
