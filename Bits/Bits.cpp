@@ -28,7 +28,7 @@ LPWSTR WithoutExe(LPWSTR pCmdLine)
 
 extern "C" int MyStartup()
 {
-	// We're trying to be small, so we don't want an embedded manifest
+	// We're trying to be small, so we don't want an embedded manifest.
 	// On modern systems if DPI awareness isn't enabled things look
 	// somewhat "retro". We want to get as fancy as the client system
 	// supports but still run on DPI-unaware systems. To that end we use
