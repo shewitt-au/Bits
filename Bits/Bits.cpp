@@ -9,6 +9,105 @@
 
 #include "framework.h"
 #include <stdint.h>
+#include <shellapi.h>
+
+int i;
+
+void ElevateClone()
+{
+	WCHAR MyPath[MAX_PATH];
+	GetModuleFileName(NULL, MyPath, sizeof(MyPath));
+
+	SHELLEXECUTEINFO Info = {
+		sizeof(SHELLEXECUTEINFO),	// DWORD cbSize
+		0,							// ULONG fMask
+		NULL,						// HWND hwnd
+		L"runas",					// LPCWSTR lpVerb
+		MyPath,						// LPCWSTR lpFile
+		L":",						// LPCWSTR lpParameters
+		NULL,						// LPCWSTR lpDirectory
+		SW_SHOWNORMAL,				// int nShow
+		NULL,						// HINSTANCE hInstApp
+		NULL,						// void* lpIDList
+		NULL,						// LPCWSTR lpClass
+		NULL,						// HKEY hkeyClass
+		0,							// DWORD dwHotKey
+		NULL, 						//	union {
+									//     HANDLE hIcon;
+									//     HANDLE hMonitor;
+									//     } DUMMYUNIONNAME;
+		NULL						// HANDLE hProcess
+	};
+
+	ShellExecuteEx(&Info);
+}
+
+void Install()
+{
+	HKEY hkstar;
+	LSTATUS st =	RegOpenKeyExA(
+						HKEY_CLASSES_ROOT,	// HKEY   hKey
+						"*",				// LPCSTR lpSubKey
+						0,					// DWORD  ulOptions
+						KEY_ALL_ACCESS,		// REGSAM samDesired
+						&hkstar				// PHKEY  phkResult
+					);
+
+	HKEY hkshell;
+	st =			RegOpenKeyExA(
+						hkstar,				// HKEY hKey
+						"shell",			// LPCSTR lpSubKey
+						0,					// DWORD  ulOptions
+						KEY_ALL_ACCESS,		// REGSAM samDesired
+						&hkshell				// PHKEY  phkResult
+					);
+
+	HKEY hktype;
+	st =			RegCreateKeyExA(
+						hkshell,			// HKEY hKey
+						"32 or 64 bit?",	// LPCSTR lpSubKey
+						0,					// DWORD Reserved
+						NULL,				// LPSTR lpClass
+						0,					// DWORD dwOptions
+						KEY_ALL_ACCESS,		// REGSAM samDesired
+						NULL,				// const LPSECURITY_ATTRIBUTES lpSecurityAttributes
+						&hktype,			// PHKEY phkResult
+						NULL				// LPDWORD lpdwDisposition
+					);
+
+	const char command[] = "C:\\Commands\\Bits.exe %1";
+	st =			RegSetKeyValueA(
+						hktype,				// HKEY hKey
+						"command",			// LPCSTR lpSubKey
+						NULL,				// LPCSTR lpValueName
+						REG_SZ,				// DWORD dwType
+						command,			// LPCVOID lpData
+						sizeof(command)		// DWORD   cbData
+					);
+}
+
+void Uninstall()
+{
+}
+
+void ManageShellIntegration()
+{
+	int req = MessageBoxA(
+				NULL,
+				"Do you want Shell integration?\n"
+					"Selecting \"Yes\" enables it, and \"No\" disables it.",
+				"Shell integration?",
+				MB_YESNOCANCEL
+				);
+	switch (req)
+	{
+	case IDYES:
+		Install();
+		break;
+	case IDNO:
+		Uninstall();
+	}
+}
 
 LPWSTR WithoutExe(LPWSTR pCmdLine)
 {
@@ -134,7 +233,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(nCmdShow);
-	
+
+	if (*lpCmdLine == 0)
+	{
+		ElevateClone();
+		return 0;
+	}
+	else if (*lpCmdLine==L':')
+	{
+		ManageShellIntegration();
+		return 0;
+	}
+
 	WORD magic;
 	PIMAGE_DOS_HEADER pDOS;
 	PIMAGE_NT_HEADERS pNT;
