@@ -28,16 +28,21 @@ LPWSTR WithoutExe(LPWSTR pCmdLine)
 
 extern "C" int MyStartup()
 {
+	// We're trying to be small, so we don't want an embedded manifest
+	// On modern systems if DPI awareness isn't enabled things look
+	// somewhat "retro". We want to get as fancy as the client system
+	// supports but still run on DPI-unaware systems. To that end we use
+	// runtime linking and try for the newest-fangledness we can get.
 	HMODULE hU32 = GetModuleHandle(L"user32.dll");
 	if (hU32)
 	{
-		typedef DPI_AWARENESS_CONTEXT (WINAPI *PSTDA)(DPI_AWARENESS_CONTEXT);
-		PSTDA pSTDA = (PSTDA)GetProcAddress(hU32, "SetThreadDpiAwarenessContext");
-		if (pSTDA)
+		typedef DPI_AWARENESS_CONTEXT (WINAPI * PDPIAC)(DPI_AWARENESS_CONTEXT);
+		PDPIAC pFn = (PDPIAC)GetProcAddress(hU32, "SetThreadDpiAwarenessContext");
+		if (pFn)
 		{
-			auto old = (*pSTDA)(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+			auto old = (*pFn)(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 			if (!old)
-				(*pSTDA)(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
+				(*pFn)(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
 		}
 	}
 
