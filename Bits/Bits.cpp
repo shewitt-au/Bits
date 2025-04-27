@@ -88,6 +88,58 @@ void Install()
 
 void Uninstall()
 {
+	HKEY hkstar;
+	LSTATUS st =	RegOpenKeyExA(
+						HKEY_CLASSES_ROOT,	// HKEY   hKey
+						"*",				// LPCSTR lpSubKey
+						0,					// DWORD  ulOptions
+						KEY_ALL_ACCESS,		// REGSAM samDesired
+						&hkstar				// PHKEY  phkResult
+					);
+
+	HKEY hkshell;
+	st =			RegOpenKeyExA(
+						hkstar,				// HKEY hKey
+						"shell",			// LPCSTR lpSubKey
+						0,					// DWORD  ulOptions
+						KEY_ALL_ACCESS,		// REGSAM samDesired
+						&hkshell			// PHKEY  phkResult
+					);
+
+	HKEY hktype;
+	st =			RegOpenKeyExA(
+						hkshell,				// HKEY hKey
+						"32 or 64 bit?",	// LPCSTR lpSubKey
+						0,					// DWORD  ulOptions
+						KEY_ALL_ACCESS,		// REGSAM samDesired
+						&hktype				// PHKEY  phkResult
+						);
+
+	st =			RegDeleteKeyA(
+						hktype,			// HKEY  hKey
+						"command"		// LPCSTR lpSubKey
+					);
+
+	st =			RegDeleteKeyA(
+						hkshell,			// HKEY  hKey
+						"32 or 64 bit?"		// LPCSTR lpSubKey
+					);
+
+
+	/*if (st != ERROR_SUCCESS)
+	{
+		DWORD lastError = st; // GetLastError();
+		TCHAR buffer[256]; // Allocate buffer for the error message
+		DWORD result = FormatMessage(
+			FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			NULL,
+			lastError,
+			MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+			(LPTSTR)buffer,
+			sizeof(buffer) / sizeof(TCHAR),
+			NULL);
+		MessageBox(NULL, buffer, L"Fuck off!", MB_OK);
+	}*/
 }
 
 void ManageShellIntegration()
