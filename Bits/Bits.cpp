@@ -175,7 +175,7 @@ void Install()
 
     WCHAR MyPath[MAX_PATH];
     GetModuleFileName(NULL, MyPath, sizeof(MyPath)/sizeof(WCHAR));
-    //                       "       "   %   1
+    //                       "   "  sp   %   1
     WCHAR Command[MAX_PATH + 1 + 1 + 1 + 1 + 1];
     LPCWSTR pSource = MyPath;
     LPWSTR  pDest = Command;
