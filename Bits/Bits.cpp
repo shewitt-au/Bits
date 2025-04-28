@@ -376,7 +376,7 @@ public:
     template <typename T>
     bool check(T *p) const
     {
-        return (uint8_t*)p>=m_pBegin && (uint8_t*)p+sizeof(T)<=m_pEnd;
+        return (uint8_t*)p>=m_pBegin && (uint8_t*)p+sizeof(T)<m_pEnd;
     }
 
 private:
