@@ -270,9 +270,10 @@ LPWSTR WithoutExe(LPWSTR pCmdLine)
 /*
 I want Bits to be as small as possible and to have no dependencies beyond what
 is guaranteed to be present on the system. To that end I’m not using any C/C++
-runtimes. The real entry point, _WinMainCRTStartup (which calls WinMain), is
-dependent on the C/C++ runtime library. We bypass _WinMainCRTStartup and provide
-our own. This has costs beyond the obvious (can’t use C/C++ runtime functions),
+runtimes. Normally the entry point in a Windows "/SUBSYSTEM:WINDOWS" process
+is _WinMainCRTStartup (which calls WinMain). _WinMainCRTStartup is dependent on
+the C/C++ runtime library. We bypass _WinMainCRTStartup and provide our own.
+This has costs beyond the obvious (can’t use C/C++ runtime functions),
 SOME of which are:
   - No constructors/destructors are called on global objects
   - No exception handling
