@@ -56,14 +56,15 @@ class RegKey
 public:
     RegKey(HKEY hkParent, LPCSTR pSubKey = NULL)
     {
-        m_hKey = NULL;
         LSTATUS st = RegOpenKeyExA(
-            hkParent,       // HKEY   hKey
-            pSubKey,        // LPCSTR lpSubKey
-            0,              // DWORD  ulOptions
-            KEY_ALL_ACCESS, // REGSAM samDesired
-            &m_hKey         // PHKEY  phkResult
-        );
+                        hkParent,       // HKEY   hKey
+                        pSubKey,        // LPCSTR lpSubKey
+                        0,              // DWORD  ulOptions
+                        KEY_ALL_ACCESS, // REGSAM samDesired
+                        &m_hKey         // PHKEY  phkResult
+                        );
+        if (st!=ERROR_SUCCESS)
+            m_hKey = NULL;
     }
 
     RegKey(const RegKey& parent, LPCSTR pSubKey = NULL)
@@ -85,42 +86,44 @@ public:
     RegKey CreateKey(LPCSTR pName)
     {
         RegKey sub;
-        RegCreateKeyExA(
-            m_hKey,             // HKEY hKey
-            pName,              // LPCSTR lpSubKey
-            0,                  // DWORD Reserved
-            NULL,               // LPSTR lpClass
-            0,                  // DWORD dwOptions
-            KEY_ALL_ACCESS,     // REGSAM samDesired
-            NULL,               // const LPSECURITY_ATTRIBUTES lpSecurityAttributes
-            &sub.m_hKey,        // PHKEY phkResult
-            NULL                // LPDWORD lpdwDisposition
-        );
+        LSTATUS st = RegCreateKeyExA(
+                        m_hKey,         // HKEY hKey
+                        pName,          // LPCSTR lpSubKey
+                        0,              // DWORD Reserved
+                        NULL,           // LPSTR lpClass
+                        0,              // DWORD dwOptions
+                        KEY_ALL_ACCESS, // REGSAM samDesired
+                        NULL,           // const LPSECURITY_ATTRIBUTES lpSecurityAttributes
+                        &sub.m_hKey,    // PHKEY phkResult
+                        NULL            // LPDWORD lpdwDisposition
+                        );
+        if (st!=ERROR_SUCCESS)
+            sub.m_hKey = NULL;
 
         return sub;
     }
     bool DeleteKey(LPCSTR pName)
     {
         LRESULT st = RegDeleteKeyA(
-            m_hKey,     // HKEY  hKey
-            pName       // LPCSTR lpSubKey
-        );
+                        m_hKey, // HKEY hKey
+                        pName   // LPCSTR lpSubKey
+                        );
 
-        return st != ERROR_SUCCESS;
+        return st == ERROR_SUCCESS;
     };
 
     bool SetValue(LPCWSTR pValue, LPCWSTR pKey=NULL)
     {
         LRESULT st = RegSetKeyValue(
-            m_hKey,             // HKEY hKey
-            pKey,               // LPCSTR lpSubKey
-            NULL,               // LPCSTR lpValueName
-            REG_SZ,             // DWORD dwType
-            pValue,             // LPCVOID lpData
-            (wcslen(pValue)+1)*sizeof(WCHAR)    // DWORD cbData
-        );
+                        m_hKey,     // HKEY hKey
+                        pKey,       // LPCSTR lpSubKey
+                        NULL,       // LPCSTR lpValueName
+                        REG_SZ,     // DWORD dwType
+                        pValue,     // LPCVOID lpData
+                        (wcslen(pValue)+1)*sizeof(WCHAR) // DWORD cbData
+                        );
 
-        return st != ERROR_SUCCESS;
+        return st == ERROR_SUCCESS;
     }
 
 private:
@@ -131,11 +134,36 @@ private:
     HKEY m_hKey;
 };
 
+void InstallUninstallProblem()
+{
+    MessageBoxA(
+        NULL,
+        "Error installing/uninstalling context menu!",
+        "Bits?",
+        MB_OK | MB_ICONERROR
+    );
+}
+
 void Install()
 {
     RegKey star(HKEY_CLASSES_ROOT, "*");
+    if (!star)
+    {
+        InstallUninstallProblem();
+        return;
+    }
     RegKey shell(star, "shell");
+    if (!shell)
+    {
+        InstallUninstallProblem();
+        return;
+    }
     RegKey menu_entry = shell.CreateKey(g_MenuItemName);
+    if (!menu_entry)
+    {
+        InstallUninstallProblem();
+        return;
+    }
 
     WCHAR MyPath[MAX_PATH];
     GetModuleFileName(NULL, MyPath, sizeof(MyPath)/sizeof(WCHAR));
@@ -152,16 +180,46 @@ void Install()
     *(pDest++) = L'1';
     *(pDest++) = 0;
 
-    menu_entry.SetValue(Command, L"command");
+    bool ok = menu_entry.SetValue(Command, L"command");
+    if (!ok)
+    {
+        InstallUninstallProblem();
+        return;
+    }
 }
 
 void Uninstall()
 {
     RegKey star(HKEY_CLASSES_ROOT, "*");
+    if (!star)
+    {
+        InstallUninstallProblem();
+        return;
+    }
     RegKey shell(star, "shell");
+    if (!shell)
+    {
+        InstallUninstallProblem();
+        return;
+    }
     RegKey menu_entry(shell, g_MenuItemName);
-    menu_entry.DeleteKey("command");
-    shell.DeleteKey(g_MenuItemName);
+    if (!menu_entry)
+    {
+        InstallUninstallProblem();
+        return;
+    }
+    bool ok = menu_entry.DeleteKey("command");
+    if (!ok)
+    {
+        InstallUninstallProblem();
+        return;
+    }
+    ok = shell.DeleteKey(g_MenuItemName);
+    if (!ok)
+    {
+        InstallUninstallProblem();
+        return;
+    }
 }
 
 void ManageShellIntegration()
