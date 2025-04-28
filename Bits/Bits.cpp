@@ -10,6 +10,8 @@ Author: Stephen Hewitt
 // https://docs.microsoft.com/en-us/archive/msdn-magazine/2002/february/inside-windows-win32-portable-executable-file-format-in-detail
 // https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#ms-dos-stub-image-only
 
+#define VERSIONSTRING "1.1"
+
 #pragma comment(linker, "/merge:.rdata=.text")
 //#pragma comment(linker, "/merge:.idata=.text") // REFUSES TO WORK
 
@@ -234,7 +236,7 @@ void ManageShellIntegration()
 {
     int req = MessageBoxA(
                 NULL,
-                "Bits version 1.0\n"
+                "Bits v" VERSIONSTRING " \n"
                     "By Stephen Hewitt\n\n"
                     "Do you want an Explorer context menu?\n"
                     "Selecting \"Yes\" adds one, and \"No\" removes it.",
