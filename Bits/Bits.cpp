@@ -1,5 +1,11 @@
-// Bits.cpp : Defines the entry point for the application.
-//
+/*
+Bits is a Windows utility that determines whether a PE file is 32 or 64-bit.
+It is designed to be as small as possible and to have no dependencies beyond
+that which is guaranteed to be on the system. It adds an Explorer right-click
+menu item.
+
+Author: Stephen Hewitt
+*/
 
 // https://docs.microsoft.com/en-us/archive/msdn-magazine/2002/february/inside-windows-win32-portable-executable-file-format-in-detail
 // https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#ms-dos-stub-image-only
@@ -103,6 +109,7 @@ public:
 
         return sub;
     }
+
     bool DeleteKey(LPCSTR pName)
     {
         LRESULT st = RegDeleteKeyA(
