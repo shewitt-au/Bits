@@ -13,10 +13,14 @@
 #include <stdint.h>
 #include <shellapi.h>
 
-// To install or uninstall the Explorer context menu we need administrator
-// privileges. We spawn another instance of ourself requesting elevation.
-// Was pass a single ‘:’ character, which is illegal in filenames, as the
-// parameter to signal that we want to manage the context menu.
+const char g_MenuItemName[] = "32 or 64 bit?";
+
+/*
+To install or uninstall the Explorer context menu we need administrator
+privileges. We spawn another instance of ourself requesting elevation.
+Was pass a single ‘:’ character, which is illegal in filenames, as the
+parameter to signal that we want to manage the context menu.
+*/
 void ElevateClone()
 {
     WCHAR MyPath[MAX_PATH];
@@ -131,7 +135,7 @@ void Install()
 {
     RegKey star(HKEY_CLASSES_ROOT, "*");
     RegKey shell(star, "shell");
-    RegKey menu_entry = shell.CreateKey("32 or 64 bit?");
+    RegKey menu_entry = shell.CreateKey(g_MenuItemName);
 
     WCHAR MyPath[MAX_PATH];
     GetModuleFileName(NULL, MyPath, sizeof(MyPath)/sizeof(WCHAR));
@@ -155,9 +159,9 @@ void Uninstall()
 {
     RegKey star(HKEY_CLASSES_ROOT, "*");
     RegKey shell(star, "shell");
-    RegKey menu_entry(shell, "32 or 64 bit?");
+    RegKey menu_entry(shell, g_MenuItemName);
     menu_entry.DeleteKey("command");
-    shell.DeleteKey("32 or 64 bit?");
+    shell.DeleteKey(g_MenuItemName);
 }
 
 void ManageShellIntegration()
@@ -195,6 +199,17 @@ LPWSTR WithoutExe(LPWSTR pCmdLine)
     }
 }
 
+/*
+I want Bits to be as small as possible and to have no dependencies beyond what
+is guaranteed to be present on the system. To that end I’m not using any C/C++
+runtimes. The real entry point, _WinMainCRTStartup (which calls WinMain), is
+dependent on the C/C++ runtime library. We bypass _WinMainCRTStartup and provide
+our own. This has costs beyond the obvious (can’t use C/C++ runtime functions),
+SOME of which are:
+  - No constructors/destructors are called on global objects
+  - No exception handling
+  - No new and delete
+*/
 extern "C" int MyStartup()
 {
     // We're trying to be small, so we don't want an embedded manifest.
@@ -230,6 +245,7 @@ public:
     MemFile(LPCWSTR pFile)
     {
         m_pBegin = NULL;
+        m_pEnd = NULL;
 
         HANDLE hFile = CreateFileW(
             pFile,                 // LPCWSTR lpFileName
@@ -287,19 +303,19 @@ public:
     template <typename T>
     bool check(T *p) const
     {
-        return (uint8_t*)p >= m_pBegin && (uint8_t*)p + sizeof(T) <= m_pEnd;
+        return (uint8_t*)p>=m_pBegin && (uint8_t*)p+sizeof(T)<=m_pEnd;
     }
 
 private:
     uint8_t *m_pBegin;
-    uint8_t *m_pEnd;
+    uint8_t *m_pEnd; // One past the end.
 
 };
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+int APIENTRY wWinMain(_In_     HINSTANCE hInstance,
+                      _In_opt_ HINSTANCE hPrevInstance,
+                      _In_     LPWSTR    lpCmdLine,
+                      _In_     int       nCmdShow)
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(nCmdShow);
