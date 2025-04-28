@@ -23,24 +23,24 @@ void ElevateClone()
     GetModuleFileName(NULL, MyPath, sizeof(MyPath)/sizeof(WCHAR));
 
     SHELLEXECUTEINFO Info = {
-        sizeof(SHELLEXECUTEINFO),	// DWORD cbSize
-        0,							// ULONG fMask
-        NULL,						// HWND hwnd
-        L"runas",					// LPCWSTR lpVerb
-        MyPath,						// LPCWSTR lpFile
-        L":",						// LPCWSTR lpParameters
-        NULL,						// LPCWSTR lpDirectory
-        SW_SHOWNORMAL,				// int nShow
-        NULL,						// HINSTANCE hInstApp
-        NULL,						// void* lpIDList
-        NULL,						// LPCWSTR lpClass
-        NULL,						// HKEY hkeyClass
-        0,							// DWORD dwHotKey
-        NULL, 						//	union {
+        sizeof(SHELLEXECUTEINFO),   // DWORD cbSize
+        0,                          // ULONG fMask
+        NULL,                       // HWND hwnd
+        L"runas",                   // LPCWSTR lpVerb
+        MyPath,                     // LPCWSTR lpFile
+        L":",                       // LPCWSTR lpParameters
+        NULL,                       // LPCWSTR lpDirectory
+        SW_SHOWNORMAL,              // int nShow
+        NULL,                       // HINSTANCE hInstApp
+        NULL,                       // void* lpIDList
+        NULL,                       // LPCWSTR lpClass
+        NULL,                       // HKEY hkeyClass
+        0,                          // DWORD dwHotKey
+        NULL,                       //  union {
                                     //     HANDLE hIcon;
                                     //     HANDLE hMonitor;
                                     //     } DUMMYUNIONNAME;
-        NULL						// HANDLE hProcess
+        NULL                        // HANDLE hProcess
     };
 
     if (!ShellExecuteEx(&Info))
@@ -86,15 +86,15 @@ public:
     {
         RegKey sub;
         RegCreateKeyExA(
-            m_hKey,		        // HKEY hKey
-            pName,	            // LPCSTR lpSubKey
-            0,					// DWORD Reserved
-            NULL,				// LPSTR lpClass
-            0,					// DWORD dwOptions
-            KEY_ALL_ACCESS,		// REGSAM samDesired
-            NULL,				// const LPSECURITY_ATTRIBUTES lpSecurityAttributes
-            &sub.m_hKey,		// PHKEY phkResult
-            NULL				// LPDWORD lpdwDisposition
+            m_hKey,             // HKEY hKey
+            pName,              // LPCSTR lpSubKey
+            0,                  // DWORD Reserved
+            NULL,               // LPSTR lpClass
+            0,                  // DWORD dwOptions
+            KEY_ALL_ACCESS,     // REGSAM samDesired
+            NULL,               // const LPSECURITY_ATTRIBUTES lpSecurityAttributes
+            &sub.m_hKey,        // PHKEY phkResult
+            NULL                // LPDWORD lpdwDisposition
         );
 
         return sub;
@@ -102,8 +102,8 @@ public:
     bool DeleteKey(LPCSTR pName)
     {
         LRESULT st = RegDeleteKeyA(
-            m_hKey,		// HKEY  hKey
-            pName		// LPCSTR lpSubKey
+            m_hKey,     // HKEY  hKey
+            pName       // LPCSTR lpSubKey
         );
 
         return st != ERROR_SUCCESS;
@@ -112,12 +112,12 @@ public:
     bool SetValue(LPCWSTR pValue, LPCWSTR pKey=NULL)
     {
         LRESULT st = RegSetKeyValue(
-            m_hKey,			    // HKEY hKey
-            pKey,			    // LPCSTR lpSubKey
-            NULL,			    // LPCSTR lpValueName
-            REG_SZ,		    	// DWORD dwType
-            pValue,		    	// LPCVOID lpData
-            (wcslen(pValue)+1)*sizeof(WCHAR)	// DWORD cbData
+            m_hKey,             // HKEY hKey
+            pKey,               // LPCSTR lpSubKey
+            NULL,               // LPCSTR lpValueName
+            REG_SZ,             // DWORD dwType
+            pValue,             // LPCVOID lpData
+            (wcslen(pValue)+1)*sizeof(WCHAR)    // DWORD cbData
         );
 
         return st != ERROR_SUCCESS;
@@ -135,7 +135,7 @@ void Install()
 
     WCHAR MyPath[MAX_PATH];
     GetModuleFileName(NULL, MyPath, sizeof(MyPath)/sizeof(WCHAR));
-    //                      "  "     %  1
+    //                       "       "   %   1
     WCHAR Command[MAX_PATH + 1 + 1 + 1 + 1 + 1];
     LPCWSTR pSource = MyPath;
     LPWSTR  pDest = Command;
@@ -233,7 +233,7 @@ public:
 
         HANDLE hFile = CreateFileW(
             pFile,                 // LPCWSTR lpFileName
-            GENERIC_READ,	       // DWORD   dwDesiredAccess
+            GENERIC_READ,          // DWORD   dwDesiredAccess
             FILE_SHARE_READ,       // DWORD   dwShareMode
             NULL,                  // LPSECURITY_ATTRIBUTES lpSecurityAttributes
             OPEN_EXISTING,         // DWORD   dwCreationDisposition
