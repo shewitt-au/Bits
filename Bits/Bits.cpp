@@ -226,7 +226,11 @@ extern "C" int MyStartup()
         {
             auto old = (*pFn)(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
             if (!old)
+            {
                 (*pFn)(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
+                if (!old)
+                    (*pFn)(DPI_AWARENESS_CONTEXT_SYSTEM_AWARE);
+            }
         }
     }
 
