@@ -8,9 +8,15 @@
 //#pragma comment(linker, "/merge:.idata=.text") // REFUSES TO WORK
 
 #include "framework.h"
+#include <string.h>
+#pragma intrinsic(wcslen)
 #include <stdint.h>
 #include <shellapi.h>
 
+// To install or uninstall the Explorer context menu we need administrator
+// privileges. We spawn another instance of ourself requesting elevation.
+// Was pass a single ‘:’ character, which is illegal in filenames, as the
+// parameter to signal that we want to manage the context menu.
 void ElevateClone()
 {
     WCHAR MyPath[MAX_PATH];
@@ -41,103 +47,117 @@ void ElevateClone()
         MessageBoxA(NULL, "Failed to elevate!", NULL, MB_OK | MB_ICONERROR);
 }
 
+class RegKey
+{
+public:
+    RegKey() : m_hKey(NULL)
+    {
+    }
+
+    RegKey(HKEY hkParent, LPCSTR pSubKey = NULL)
+    {
+        m_hKey = NULL;
+        LSTATUS st = RegOpenKeyExA(
+            hkParent,       // HKEY   hKey
+            pSubKey,        // LPCSTR lpSubKey
+            0,              // DWORD  ulOptions
+            KEY_ALL_ACCESS, // REGSAM samDesired
+            &m_hKey         // PHKEY  phkResult
+        );
+    }
+
+    RegKey(const RegKey& parent, LPCSTR pSubKey = NULL)
+        : RegKey(parent.m_hKey, pSubKey)
+    {
+    }
+
+    operator bool() const
+    {
+        return m_hKey != NULL;
+    }
+
+    ~RegKey()
+    {
+        if (m_hKey)
+            RegCloseKey(m_hKey);
+    }
+
+    RegKey CreateKey(LPCSTR pName)
+    {
+        RegKey sub;
+        RegCreateKeyExA(
+            m_hKey,		        // HKEY hKey
+            pName,	            // LPCSTR lpSubKey
+            0,					// DWORD Reserved
+            NULL,				// LPSTR lpClass
+            0,					// DWORD dwOptions
+            KEY_ALL_ACCESS,		// REGSAM samDesired
+            NULL,				// const LPSECURITY_ATTRIBUTES lpSecurityAttributes
+            &sub.m_hKey,		// PHKEY phkResult
+            NULL				// LPDWORD lpdwDisposition
+        );
+
+        return sub;
+    }
+    bool DeleteKey(LPCSTR pName)
+    {
+        LRESULT st = RegDeleteKeyA(
+            m_hKey,		// HKEY  hKey
+            pName		// LPCSTR lpSubKey
+        );
+
+        return st != ERROR_SUCCESS;
+    };
+
+    bool SetValue(LPCWSTR pValue, LPCWSTR pKey=NULL)
+    {
+        LRESULT st = RegSetKeyValue(
+            m_hKey,			    // HKEY hKey
+            pKey,			    // LPCSTR lpSubKey
+            NULL,			    // LPCSTR lpValueName
+            REG_SZ,		    	// DWORD dwType
+            pValue,		    	// LPCVOID lpData
+            (wcslen(pValue)+1)*sizeof(WCHAR)	// DWORD cbData
+        );
+
+        return st != ERROR_SUCCESS;
+    }
+
+private:
+    HKEY m_hKey;
+};
+
 void Install()
 {
-    HKEY hkstar;
-    LSTATUS st =	RegOpenKeyExA(
-                        HKEY_CLASSES_ROOT,	// HKEY   hKey
-                        "*",				// LPCSTR lpSubKey
-                        0,					// DWORD  ulOptions
-                        KEY_ALL_ACCESS,		// REGSAM samDesired
-                        &hkstar				// PHKEY  phkResult
-                    );
+    RegKey star(HKEY_CLASSES_ROOT, "*");
+    RegKey shell(star, "shell");
+    RegKey menu_entry = shell.CreateKey("32 or 64 bit?");
 
-    HKEY hkshell;
-    st =			RegOpenKeyExA(
-                        hkstar,				// HKEY hKey
-                        "shell",			// LPCSTR lpSubKey
-                        0,					// DWORD  ulOptions
-                        KEY_ALL_ACCESS,		// REGSAM samDesired
-                        &hkshell			// PHKEY  phkResult
-                    );
+    WCHAR MyPath[MAX_PATH];
+    GetModuleFileName(NULL, MyPath, sizeof(MyPath)/sizeof(WCHAR));
+    //                      "  "     %  1
+    WCHAR Command[MAX_PATH + 1 + 1 + 1 + 1 + 1];
+    LPCWSTR pSource = MyPath;
+    LPWSTR  pDest = Command;
+    *(pDest++) = L'"';
+    for (; *pSource; ++pSource, ++pDest)
+        *pDest = *pSource;
+    *(pDest++) = L'"';
+    *(pDest++) = L' ';
+    *(pDest++) = L'%';
+    *(pDest++) = L'1';
+    *(pDest++) = 0;
 
-    HKEY hktype;
-    st =			RegCreateKeyExA(
-                        hkshell,			// HKEY hKey
-                        "32 or 64 bit?",	// LPCSTR lpSubKey
-                        0,					// DWORD Reserved
-                        NULL,				// LPSTR lpClass
-                        0,					// DWORD dwOptions
-                        KEY_ALL_ACCESS,		// REGSAM samDesired
-                        NULL,				// const LPSECURITY_ATTRIBUTES lpSecurityAttributes
-                        &hktype,			// PHKEY phkResult
-                        NULL				// LPDWORD lpdwDisposition
-                    );
-
-    const char command[] = "C:\\Commands\\Bits.exe %1";
-    st =			RegSetKeyValueA(
-                        hktype,				// HKEY hKey
-                        "command",			// LPCSTR lpSubKey
-                        NULL,				// LPCSTR lpValueName
-                        REG_SZ,				// DWORD dwType
-                        command,			// LPCVOID lpData
-                        sizeof(command)		// DWORD   cbData
-                    );
+    menu_entry.SetValue(Command, L"command");
 }
 
 void Uninstall()
 {
-    HKEY hkstar;
-    LSTATUS st =	RegOpenKeyExA(
-                        HKEY_CLASSES_ROOT,	// HKEY   hKey
-                        "*",				// LPCSTR lpSubKey
-                        0,					// DWORD  ulOptions
-                        KEY_ALL_ACCESS,		// REGSAM samDesired
-                        &hkstar				// PHKEY  phkResult
-                    );
-
-    HKEY hkshell;
-    st =			RegOpenKeyExA(
-                        hkstar,				// HKEY hKey
-                        "shell",			// LPCSTR lpSubKey
-                        0,					// DWORD  ulOptions
-                        KEY_ALL_ACCESS,		// REGSAM samDesired
-                        &hkshell			// PHKEY  phkResult
-                    );
-
-    HKEY hktype;
-    st =			RegOpenKeyExA(
-                        hkshell,			// HKEY hKey
-                        "32 or 64 bit?",	// LPCSTR lpSubKey
-                        0,					// DWORD  ulOptions
-                        KEY_ALL_ACCESS,		// REGSAM samDesired
-                        &hktype				// PHKEY  phkResult
-                        );
-
-    st =			RegDeleteKeyA(
-                        hktype,				// HKEY  hKey
-                        "command"			// LPCSTR lpSubKey
-                    );
-
-    st =			RegDeleteKeyA(
-                        hkshell,			// HKEY  hKey
-                        "32 or 64 bit?"		// LPCSTR lpSubKey
-                    );
-
-    /*if (st != ERROR_SUCCESS)
-    {
-        DWORD lastError = st; // GetLastError();
-        TCHAR buffer[256]; // Allocate buffer for the error message
-        DWORD result = FormatMessage(
-            FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL,
-            lastError,
-            MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
-            (LPTSTR)buffer,
-            sizeof(buffer) / sizeof(TCHAR),
-            NULL);
-        MessageBox(NULL, buffer, L"Fuck off!", MB_OK);
-    }*/
+    RegKey star(HKEY_CLASSES_ROOT, "*");
+    RegKey shell(star, "shell");
+    RegKey menu_entry = shell.CreateKey("32 or 64 bit?");
+    menu_entry.DeleteKey("command");
+    shell.DeleteKey("32 or 64 bit?");
 }
 
 void ManageShellIntegration()
