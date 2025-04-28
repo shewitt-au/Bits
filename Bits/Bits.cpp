@@ -15,7 +15,7 @@ Author: Stephen Hewitt
 #pragma comment(linker, "/merge:.rdata=.text")
 //#pragma comment(linker, "/merge:.idata=.text") // REFUSES TO WORK
 
-#include "framework.h"
+#include "framework.hpp"
 #include <string.h>
 #pragma intrinsic(wcslen)
 #include <stdint.h>
