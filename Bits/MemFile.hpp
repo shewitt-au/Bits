@@ -7,7 +7,6 @@ This shit ain't meant to be globally useful. Locally useful will do just fine.
 */
 
 #include <stdint.h>
-#pragma intrinsic(wcslen)
 
 class MemFile
 {

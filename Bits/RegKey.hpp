@@ -6,6 +6,9 @@ Registry manipulation.
 This shit ain't meant to be globally useful. Locally useful will do just fine.
 */
 
+#include <stdint.h>
+#include <string.h>
+
 class RegKey
 {
 public:
