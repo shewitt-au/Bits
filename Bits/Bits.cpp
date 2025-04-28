@@ -13,7 +13,7 @@
 #include <stdint.h>
 #include <shellapi.h>
 
-const char g_MenuItemName[] = "32 or 64 bit?";
+const char g_MenuItemName[] = "32 or 64-bit?";
 
 /*
 To install or uninstall the Explorer context menu we need administrator
@@ -139,7 +139,7 @@ void InstallUninstallProblem()
     MessageBoxA(
         NULL,
         "Error installing/uninstalling context menu!",
-        "Bits?",
+        "Bits",
         MB_OK | MB_ICONERROR
     );
 }
@@ -449,10 +449,10 @@ int APIENTRY wWinMain(_In_     HINSTANCE hInstance,
     switch (magic)
     {
     case IMAGE_NT_OPTIONAL_HDR32_MAGIC:
-        pMsg = L"32 bit";
+        pMsg = L"32-bit";
         break;
     case IMAGE_NT_OPTIONAL_HDR64_MAGIC:
-        pMsg = L"64 bit";
+        pMsg = L"64-bit";
         break;
     default:
         pMsg = L"Unknown";
