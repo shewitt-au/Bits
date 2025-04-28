@@ -50,10 +50,6 @@ void ElevateClone()
 class RegKey
 {
 public:
-    RegKey() : m_hKey(NULL)
-    {
-    }
-
     RegKey(HKEY hkParent, LPCSTR pSubKey = NULL)
     {
         m_hKey = NULL;
@@ -124,6 +120,10 @@ public:
     }
 
 private:
+    RegKey() : m_hKey(NULL)
+    {
+    }
+
     HKEY m_hKey;
 };
 
@@ -155,7 +155,7 @@ void Uninstall()
 {
     RegKey star(HKEY_CLASSES_ROOT, "*");
     RegKey shell(star, "shell");
-    RegKey menu_entry = shell.CreateKey("32 or 64 bit?");
+    RegKey menu_entry(shell, "32 or 64 bit?");
     menu_entry.DeleteKey("command");
     shell.DeleteKey("32 or 64 bit?");
 }
