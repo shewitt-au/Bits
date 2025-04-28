@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <shellapi.h>
 
+const char g_AppName[] = "Bits";
 const char g_MenuItemName[] = "32 or 64-bit?";
 
 /*
@@ -139,7 +140,7 @@ void InstallUninstallProblem()
     MessageBoxA(
         NULL,
         "Error installing/uninstalling context menu!",
-        "Bits",
+        g_AppName,
         MB_OK | MB_ICONERROR
     );
 }
@@ -226,9 +227,11 @@ void ManageShellIntegration()
 {
     int req = MessageBoxA(
                 NULL,
-                "Do you want an Explorer context menu?\n"
+                "Bits version 1.0\n"
+                    "By Stephen Hewitt\n\n"
+                    "Do you want an Explorer context menu?\n"
                     "Selecting \"Yes\" adds one, and \"No\" removes it.",
-                "Explorer context menu?",
+                g_AppName,
                 MB_YESNOCANCEL | MB_ICONQUESTION
                 );
     switch (req)
