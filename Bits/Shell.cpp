@@ -39,10 +39,10 @@ void ElevateClone()
         NULL,                       // HKEY hkeyClass
         0,                          // DWORD dwHotKey
         NULL,                       //  union {
-        //     HANDLE hIcon;
-        //     HANDLE hMonitor;
-        //     } DUMMYUNIONNAME;
-NULL                        // HANDLE hProcess
+                                    //     HANDLE hIcon;
+                                    //     HANDLE hMonitor;
+                                    //     } DUMMYUNIONNAME;
+        NULL                        // HANDLE hProcess
     };
 
     if (!ShellExecuteEx(&Info))
