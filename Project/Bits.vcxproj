@@ -23,7 +23,6 @@
     <ClInclude Include="..\src\MemFile.hpp" />
     <ClInclude Include="..\src\RegKey.hpp" />
     <ClInclude Include="..\src\Shell.hpp" />
-    <ClInclude Include="..\src\targetver.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\App.cpp" />
