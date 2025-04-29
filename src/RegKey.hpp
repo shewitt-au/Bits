@@ -12,35 +12,13 @@ class RegKey
 {
 public:
     RegKey(HKEY hkParent, LPCSTR pSubKey = NULL);
+    RegKey(const RegKey& parent, LPCSTR pSubKey = NULL);
+    ~RegKey();
 
-    RegKey(const RegKey& parent, LPCSTR pSubKey = NULL)
-        : RegKey(parent.m_hKey, pSubKey)
-    {
-    }
-
-    operator bool() const
-    {
-        return m_hKey != NULL;
-    }
-
-    ~RegKey()
-    {
-        if (m_hKey)
-            RegCloseKey(m_hKey);
-    }
+    operator bool() const;
 
     RegKey CreateKey(LPCSTR pName);
-
-    bool DeleteKey(LPCSTR pName)
-    {
-        LRESULT st = RegDeleteKeyA(
-                        m_hKey, // HKEY hKey
-                        pName   // LPCSTR lpSubKey
-                        );
-
-        return st == ERROR_SUCCESS;
-    };
-
+    bool DeleteKey(LPCSTR pName);
     bool SetValue(LPCWSTR pValue, LPCWSTR pKey = NULL);
 
 private:
@@ -49,4 +27,32 @@ private:
     }
 
     HKEY m_hKey;
+};
+
+// Inline functions
+
+inline RegKey::RegKey(const RegKey& parent, LPCSTR pSubKey)
+    : RegKey(parent.m_hKey, pSubKey)
+{
+}
+
+inline RegKey::operator bool() const
+{
+    return m_hKey != NULL;
+}
+
+inline RegKey::~RegKey()
+{
+    if (m_hKey)
+        RegCloseKey(m_hKey);
+}
+
+inline bool RegKey::DeleteKey(LPCSTR pName)
+{
+    LRESULT st = RegDeleteKeyA(
+        m_hKey, // HKEY hKey
+        pName   // LPCSTR lpSubKey
+    );
+
+    return st == ERROR_SUCCESS;
 };

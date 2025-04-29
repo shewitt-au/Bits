@@ -9,6 +9,7 @@ Application scaffolding
 #include "RegKey.hpp"
 
 #pragma comment(linker, "/merge:.rdata=.text")
+//#pragma comment(linker, "/merge:.data=.text")  // diff attributues (seem to work?)
 //#pragma comment(linker, "/merge:.idata=.text") // REFUSES TO WORK
 
 LPWSTR WithoutExe(LPWSTR pCmdLine)
