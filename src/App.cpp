@@ -8,8 +8,19 @@ Application scaffolding
 #include <shellapi.h>
 #include "RegKey.hpp"
 
+// Merging the .rdata (read-only data) into .text is a no-brainer.
 #pragma comment(linker, "/merge:.rdata=.text")
-//#pragma comment(linker, "/merge:.data=.text")  // diff attributues (seem to work?)
+
+// This one is more complicated. It gives the following linker warning:
+//  "warning LNK4254: section '.data' (C0000040) merged into '.text'
+//   (60000020) with different attributes"
+// We're going to use it anyway, but buyer beware:
+//  The .data section is where uninitalised data is stored and it's
+//  writable. The .text section in non-writable. So uninitialized
+//  globals will not be modifiable without generating an access
+//  violation.
+#pragma comment(linker, "/merge:.data=.text")
+
 //#pragma comment(linker, "/merge:.idata=.text") // REFUSES TO WORK
 
 LPWSTR WithoutExe(LPWSTR pCmdLine)
