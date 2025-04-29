@@ -11,30 +11,30 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MemFile.hpp">
+    <ClInclude Include="..\src\framework.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RegKey.hpp">
+    <ClInclude Include="..\src\MemFile.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.hpp">
+    <ClInclude Include="..\src\RegKey.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="framework.hpp">
+    <ClInclude Include="..\src\Shell.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Shell.hpp">
+    <ClInclude Include="..\src\targetver.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Bits.cpp">
+    <ClCompile Include="..\src\Shell.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\App.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="App.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Shell.cpp">
+    <ClCompile Include="..\src\Bits.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

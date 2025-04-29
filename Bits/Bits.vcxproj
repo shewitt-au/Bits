@@ -18,6 +18,18 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\framework.hpp" />
+    <ClInclude Include="..\src\MemFile.hpp" />
+    <ClInclude Include="..\src\RegKey.hpp" />
+    <ClInclude Include="..\src\Shell.hpp" />
+    <ClInclude Include="..\src\targetver.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\App.cpp" />
+    <ClCompile Include="..\src\Bits.cpp" />
+    <ClCompile Include="..\src\Shell.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{2E26D7DA-0AA0-4F1B-8906-7BE7AE884002}</ProjectGuid>
@@ -220,18 +232,6 @@
       <ProgramDatabaseFile />
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="framework.hpp" />
-    <ClInclude Include="MemFile.hpp" />
-    <ClInclude Include="RegKey.hpp" />
-    <ClInclude Include="Shell.hpp" />
-    <ClInclude Include="targetver.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="App.cpp" />
-    <ClCompile Include="Bits.cpp" />
-    <ClCompile Include="Shell.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
