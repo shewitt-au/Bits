@@ -27,6 +27,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\App.cpp" />
     <ClCompile Include="..\src\Bits.cpp" />
+    <ClCompile Include="..\src\RegKey.cpp" />
     <ClCompile Include="..\src\Shell.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
