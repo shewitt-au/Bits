@@ -155,5 +155,6 @@ void ManageShellIntegration()
         break;
     case IDNO:
         Uninstall();
+        break;
     }
 }
