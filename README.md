@@ -11,7 +11,7 @@ wherever you like. To install/uninstall the Explorer context
 menu simply run the program and follow the prompts.
 
 ## Usage
-Right click on the file and choose “32 or 64-bit” from the
+Right click on the file and choose “32 or 64-bit?” from the
 context menu.
 
 ## Design philosophy

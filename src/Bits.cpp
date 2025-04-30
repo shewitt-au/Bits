@@ -28,7 +28,7 @@ int APIENTRY wWinMain(_In_     HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(nCmdShow);
 
     // We're a 32 bit app. Disable WOW64 file system redirection
-    // so we don't have issues accessing file in "SysWOW64".
+    // so we don't have issues accessing files in "System32".
     // Use runtime linking so we work on 32-bit systems.
     HMODULE hK32 = GetModuleHandleA("kernel32.dll");
     if (hK32)
