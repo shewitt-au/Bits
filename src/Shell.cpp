@@ -4,7 +4,7 @@
 Manage Explorer context menu integration.
 */
 
-#define VERSIONSTRING "1.1"
+#define VERSIONSTRING "1.2"
 
 #include "framework.hpp"
 #include <shellapi.h>

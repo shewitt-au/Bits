@@ -27,6 +27,11 @@ int APIENTRY wWinMain(_In_     HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(nCmdShow);
 
+    // We're a 32 bit app. Disable WOW64 file system redirection
+    // so we don't have issues accessing file in "SysWOW64".
+    PVOID old;
+    Wow64DisableWow64FsRedirection(&old);
+
     if (*lpCmdLine == 0)
     {
         ElevateClone();
