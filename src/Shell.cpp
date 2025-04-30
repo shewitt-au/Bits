@@ -1,6 +1,6 @@
-/*
-Shell.cpp
+// "Shell.cpp"
 
+/*
 Manage Explorer context menu integration.
 */
 

@@ -1,3 +1,5 @@
+// "Bits.cpp"
+
 /*
 Bits is a Windows utility that determines whether a PE file is 32 or 64-bit.
 It is designed to be as small as possible and to have no dependencies beyond
@@ -7,8 +9,11 @@ menu item.
 Author: Stephen Hewitt
 */
 
+// Links:
+//
 // https://docs.microsoft.com/en-us/archive/msdn-magazine/2002/february/inside-windows-win32-portable-executable-file-format-in-detail
 // https://docs.microsoft.com/en-us/windows/win32/debug/pe-format#ms-dos-stub-image-only
+//
 
 #include "framework.hpp"
 #include "MemFile.hpp"
@@ -35,7 +40,7 @@ int APIENTRY wWinMain(_In_     HINSTANCE hInstance,
 
     WORD magic;
     PIMAGE_DOS_HEADER pDOS;
-    PIMAGE_NT_HEADERS pNT;
+    PIMAGE_NT_HEADERS32 pNT;
     LPCWSTR pMsg = NULL;
     bool bError = false;
 

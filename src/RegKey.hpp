@@ -1,10 +1,11 @@
-#pragma once
-/*
-RegKey.hpp
+// "RegKey.hpp"
 
+/*
 Registry manipulation.
 This shit ain't meant to be globally useful. Locally useful will do just fine.
 */
+
+#pragma once
 
 #include "framework.hpp"
 

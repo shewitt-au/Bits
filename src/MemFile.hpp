@@ -1,10 +1,11 @@
-#pragma once
-/*
-MemFile.hpp
+// "MemFile.hpp"
 
+/*
 A memory mapped file class.
 This shit ain't meant to be globally useful. Locally useful will do just fine.
 */
+
+#pragma once
 
 #include "framework.hpp"
 #include <stdint.h>

@@ -1,6 +1,6 @@
-/*
-App.cpp
+// "App.cpp"
 
+/*
 Application scaffolding
 */
 

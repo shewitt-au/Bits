@@ -1,3 +1,5 @@
+// "framework.hpp"
+
 #pragma once
 
 #include <SDKDDKVer.h>
