@@ -30,7 +30,7 @@ const IMAGE_DOS_HEADER g_DH =
     0,                   // WORD   e_oemid;    // OEM identifier (for e_oeminfo)
     0,                   // WORD   e_oeminfo;  // OEM information; e_oemid specific
     0,                   // WORD   e_res2[10]; // Reserved words
-    0,                   // LONG   e_lfanew;   // File address of new exe header
+    0                    // LONG   e_lfanew;   // File address of new exe header
 };
 
 int main()
