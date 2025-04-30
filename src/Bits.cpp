@@ -29,8 +29,18 @@ int APIENTRY wWinMain(_In_     HINSTANCE hInstance,
 
     // We're a 32 bit app. Disable WOW64 file system redirection
     // so we don't have issues accessing file in "SysWOW64".
-    PVOID old;
-    Wow64DisableWow64FsRedirection(&old);
+    // Use runtime linking so we work on 32-bit systems.
+    HMODULE hK32 = GetModuleHandleA("kernel32.dll");
+    if (hK32)
+    {
+        typedef BOOL (WINAPI *PWDWFR)(PVOID*);
+        PWDWFR pFn = (PWDWFR)GetProcAddress(hK32, "Wow64DisableWow64FsRedirection");
+        if (pFn)
+        {
+            PVOID old;
+            (*pFn)(&old);
+        }
+    }
 
     if (*lpCmdLine == 0)
     {
