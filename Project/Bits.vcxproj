@@ -126,6 +126,7 @@
       <UACExecutionLevel />
       <UACUIAccess />
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <AdditionalOptions>/STUB:"..\src\dosstub.bin" %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -193,6 +194,7 @@
       <UACUIAccess />
       <RandomizedBaseAddress>false</RandomizedBaseAddress>
       <ProgramDatabaseFile />
+      <AdditionalOptions>/STUB:"..\src\dosstub.bin" %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
