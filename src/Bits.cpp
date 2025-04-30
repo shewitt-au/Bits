@@ -95,6 +95,7 @@ int APIENTRY wWinMain(_In_     HINSTANCE hInstance,
     //  IMAGE_OPTIONAL_HEADER32 and IMAGE_OPTIONAL_HEADER64.
     // Consequently IMAGE_NT_HEADERS has two flavours:
     //  IMAGE_NT_HEADERS32 and IMAGE_NT_HEADERS64
+    // Note that IMAGE_NT_HEADERS32 is smaller than IMAGE_NT_HEADERS64.
     //
     // typedef struct _IMAGE_NT_HEADERS {
     //     DWORD Signature;

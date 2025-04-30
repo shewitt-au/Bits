@@ -79,13 +79,20 @@ LPWSTR WithoutExe(LPWSTR pCmdLine)
 {
     if (*pCmdLine == L'"')
     {
+        // Find closing quote of our EXE's name
         for (++pCmdLine; *pCmdLine != L'"'; ++pCmdLine) {}
+        // Skip spaces after
         for (++pCmdLine; *pCmdLine == L' '; ++pCmdLine) {}
         return pCmdLine;
     }
     else
     {
+        // I've never seen our EXE's name not quoted,
+        // but just in case
+
+        // Find first space char
         for (; *pCmdLine != L' '; ++pCmdLine) {}
+        // Skip'em all
         for (; *pCmdLine == L' '; ++pCmdLine) {}
         return pCmdLine;
     }

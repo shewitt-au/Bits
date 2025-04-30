@@ -46,7 +46,7 @@ void ElevateClone()
     };
 
     if (!ShellExecuteEx(&Info))
-        MessageBoxA(NULL, "Failed to elevate!", g_AppName, MB_OK | MB_ICONERROR);
+        MessageBoxA(NULL, "Failed to elevate!", NULL, MB_OK | MB_ICONERROR);
 }
 
 void InstallUninstallProblem()
