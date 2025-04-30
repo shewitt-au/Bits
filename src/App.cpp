@@ -52,10 +52,10 @@ region and memory protection settings. Some common sections are:
 •  - ".idata": this section contains DLL import data.
 
 Sections have an overhead. There's the cost of the bookkeeping and then there's
-the allocation granularity of the section data itself. The linker enables
-sections to be merged using the "MERGE" option. You used to be able to merge the
-".idata" section but current versions of the MSVC toolchain don’t allow it. Care
-must be taken when merging sections with different memory protections.
+the granularity of the section size. The linker enables sections to be merged
+using the "MERGE" option. You used to be able to merge the ".idata" section but
+current versions of the MSVC toolchain don’t allow it. Care must be taken when
+merging sections with different memory protections.
 */
 
 #include "framework.hpp"
