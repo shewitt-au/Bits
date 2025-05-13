@@ -42,7 +42,7 @@ doing this and compiling you'll probably get problems. For example, if exception
 handling is enabled the app is going to need runtime support. You're going have
 to disable exceptions (see the "/EH" compiler switches).
 
-The next tick employed is section merging. When you build an app it has multiple
+The next trick employed is section merging. When you build an app it has multiple
 sections for various types of code and data. Each section as its own memory
 region and memory protection settings. Some common sections are:
    - ".text":  this section is for code and is readable and executable,
