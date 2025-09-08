@@ -35,7 +35,7 @@ const IMAGE_DOS_HEADER g_DH =
 
 int main()
 {
-    FILE* out = fopen("dosstub.exe", "wb");
+    FILE* out = fopen("dosstub.bin", "wb");
     if (out)
     {
         fwrite(&g_DH, 1, sizeof(g_DH), out);
