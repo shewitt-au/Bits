@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bits", "Project\Bits.vcxproj", "{2E26D7DA-0AA0-4F1B-8906-7BE7AE884002}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F18A1756-71CA-432E-A564-84467801C279} = {F18A1756-71CA-432E-A564-84467801C279}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MinimalDOSStub", "MinimalDOSStub\MinimalDOSStub.vcxproj", "{F18A1756-71CA-432E-A564-84467801C279}"
 EndProject

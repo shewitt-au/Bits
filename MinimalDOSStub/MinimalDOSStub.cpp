@@ -33,12 +33,16 @@ const IMAGE_DOS_HEADER g_DH =
     0                    // LONG   e_lfanew;   // File address of new exe header
 };
 
-int main()
+int main(int argc, char* argv[])
 {
-    FILE* out = fopen("dosstub.bin", "wb");
+    if (argc != 2)
+        return -1;
+    FILE* out = fopen(argv[1], "wb");
     if (out)
     {
         fwrite(&g_DH, 1, sizeof(g_DH), out);
         fclose(out);
     }
+
+    return 0;
 }
