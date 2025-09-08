@@ -1,7 +1,7 @@
 // MinimalDOSStub.cpp
 // 
 // Generate the smallest DOS stub we can.
-// We link in into Bits using the /STUB linker option.
+// We link it into Bits using the /STUB linker option.
 //
 
 #define _CRT_SECURE_NO_WARNINGS
