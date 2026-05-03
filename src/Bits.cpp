@@ -18,6 +18,56 @@ Author: Stephen Hewitt
 #include "framework.hpp"
 #include "MemFile.hpp"
 #include "Shell.hpp"
+#include "format.hpp"
+
+struct MachineNames
+{
+    WORD machine;
+    LPCWSTR name;
+};
+
+static const MachineNames g_machineNames[] =
+{
+    {IMAGE_FILE_MACHINE_I386     ,     L"Intel 386"},
+    {IMAGE_FILE_MACHINE_R3000    ,     L"MIPS little-endian, 0x160 big-endian"},
+    {IMAGE_FILE_MACHINE_R4000    ,     L"MIPS little-endian"},
+    {IMAGE_FILE_MACHINE_R10000   ,     L"MIPS little-endian"},
+    {IMAGE_FILE_MACHINE_WCEMIPSV2,     L"MIPS little-endian WCE v2"},
+    {IMAGE_FILE_MACHINE_ALPHA    ,     L"Alpha_AXP"},
+    {IMAGE_FILE_MACHINE_SH3      ,     L"SH3 little-endian"},
+    {IMAGE_FILE_MACHINE_SH3DSP   ,     L"SH3DSP"},
+    {IMAGE_FILE_MACHINE_SH3E     ,     L"SH3E little-endian"},
+    {IMAGE_FILE_MACHINE_SH4      ,     L"SH4 little-endian"},
+    {IMAGE_FILE_MACHINE_SH5      ,     L"SH5"},
+    {IMAGE_FILE_MACHINE_ARM      ,     L"ARM Little-Endian"},
+    {IMAGE_FILE_MACHINE_THUMB    ,     L"ARM Thumb/Thumb-2 Little-Endian"},
+    {IMAGE_FILE_MACHINE_ARMNT    ,     L"ARM Thumb-2 Little-Endian"},
+    {IMAGE_FILE_MACHINE_AM33     ,     L"AM33"},
+    {IMAGE_FILE_MACHINE_POWERPC  ,     L"IBM PowerPC Little-Endian"},
+    {IMAGE_FILE_MACHINE_POWERPCFP,     L"POWERPCFP"},
+    {IMAGE_FILE_MACHINE_IA64     ,     L"Intel 64"},
+    {IMAGE_FILE_MACHINE_MIPS16   ,     L"MIPS"},
+    {IMAGE_FILE_MACHINE_ALPHA64  ,     L"ALPHA64"},
+    {IMAGE_FILE_MACHINE_MIPSFPU  ,     L"MIPS"},
+    {IMAGE_FILE_MACHINE_MIPSFPU16,     L"MIPS"},
+    {IMAGE_FILE_MACHINE_AXP64    ,     L"ALPHA64"},
+    {IMAGE_FILE_MACHINE_TRICORE  ,     L"Infineon"},
+    {IMAGE_FILE_MACHINE_EBC      ,     L"EFI Byte Code"},
+    {IMAGE_FILE_MACHINE_AMD64    ,     L"AMD64 (K8)"},
+    {IMAGE_FILE_MACHINE_M32R     ,     L"M32R little-endian"},
+    {IMAGE_FILE_MACHINE_ARM64    ,     L"ARM64 Little-Endian"}
+};
+
+static LPCWSTR LookupMachine(WORD m)
+{
+    for (const auto& ent : g_machineNames)
+    {
+        if (m == ent.machine)
+            return ent.name;
+    }
+
+    return L"Unknown";
+}
 
 int APIENTRY wWinMain(_In_     HINSTANCE hInstance,
                       _In_opt_ HINSTANCE hPrevInstance,
@@ -57,6 +107,7 @@ int APIENTRY wWinMain(_In_     HINSTANCE hInstance,
     PIMAGE_DOS_HEADER pDOS;
     PIMAGE_NT_HEADERS32 pNT;
     LPCWSTR pMsg = NULL;
+    LPCWSTR pArch = NULL;
     bool bError = false;
 
     MemFile mf(lpCmdLine);
@@ -140,6 +191,8 @@ int APIENTRY wWinMain(_In_     HINSTANCE hInstance,
         goto bail;
     }
 
+    pArch = LookupMachine(pNT->FileHeader.Machine);
+
     // 'Magic' is the first member of IMAGE_OPTIONAL_HEADER (32 & 64) and thus
     // is before any differences between the 32 & 64-bit versions.
     magic = pNT->OptionalHeader.Magic;
@@ -152,9 +205,9 @@ int APIENTRY wWinMain(_In_     HINSTANCE hInstance,
     case IMAGE_NT_OPTIONAL_HDR64_MAGIC:
         if (!mf.check((PIMAGE_NT_HEADERS64)pNT))
         {
-            pMsg = L"Looks like an invalid 64 bit file!\n";
-                   L"Can't fit an IMAGE_NT_HEADERS64 at the offset pointed to by";
-                   L"e_lfanew (from IMAGE_DOS_HEADER).";
+            pMsg = L"\tLooks like an invalid 64 bit file!\n";
+                   L"\tCan't fit an IMAGE_NT_HEADERS64 at the offset pointed to by\n";
+                   L"\te_lfanew (from IMAGE_DOS_HEADER).";
             bError = true;
         }
         else
@@ -166,7 +219,8 @@ int APIENTRY wWinMain(_In_     HINSTANCE hInstance,
     }
 
 bail:
-    MessageBox(NULL, pMsg, lpCmdLine, MB_OK|(bError?MB_ICONERROR:0));
+	Message msg = format(L"File:\t%1\nCPU:\t%2\nBits:\t%3", lpCmdLine, pArch, pMsg);
+    MessageBox(NULL, msg, L"Bits", MB_OK | (bError ? MB_ICONERROR : 0));
 
     return 0;
 }
